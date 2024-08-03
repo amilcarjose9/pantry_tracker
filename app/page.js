@@ -1,11 +1,24 @@
 'use client'
 import Image from "next/image";
-import {useState, useEffect} from 'react'
-import { firestore } from "@/firebase";
+import {useState, useEffect} from 'react';
+import { auth, firestore } from "@/firebase";
 import { Box, Button, Modal, Stack, TextField, Typography } from "@mui/material";
 import { collection, deleteDoc, doc, getDocs, query, setDoc, getDoc} from "firebase/firestore";
+import { useRouter } from 'next/navigation';
+import { signOut } from 'firebase/auth';
+import {useAuthState} from 'react-firebase-hooks/auth';
 
 export default function Home() {
+  const [user] = useAuthState(auth)
+  const router = useRouter()
+  const userSession = sessionStorage.getItem('userId')
+
+  console.log({user})
+ 
+  if (!user && !userSession){
+    router.push('/sign-in')
+  }
+
   const[inventory, setInventory] = useState([])
   const[openAdd, setOpenAdd] = useState(false)
   const [openSearch, setOpenSearch] = useState(false);
@@ -13,7 +26,7 @@ export default function Home() {
   const [searchResult, setSearchResult] = useState(null);
 
   const updateInventory = async () => {
-    const snapshot = query(collection(firestore, 'inventory'))
+    const snapshot = query(collection(firestore, `users/${userSession}/inventory`))
     const docs = await getDocs(snapshot)
     const inventoryList = []
     docs.forEach((doc)=>{
@@ -28,7 +41,7 @@ export default function Home() {
   }
 
   const addItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item)
+    const docRef = doc(collection(firestore, `users/${userSession}/inventory`), item)
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()){
@@ -43,7 +56,7 @@ export default function Home() {
   }
 
   const removeItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item)
+    const docRef = doc(collection(firestore, `users/${userSession}/inventory`), item)
     const docSnap = await getDoc(docRef)
 
     if (docSnap.exists()){
@@ -88,6 +101,20 @@ export default function Home() {
       alignItems="center" 
       gap={2}
     >
+      <Button 
+        sx={{
+          position: 'absolute',
+          top: 16, 
+          right: 16 
+        }}
+        onClick={() => {
+          signOut(auth)
+          sessionStorage.removeItem('userId')
+          }}
+      >
+        Log out
+      </Button>
+
       <Modal open={openAdd} onClose={handleCloseAdd}>
         <Box
           position="absolute"
