@@ -98,10 +98,12 @@ export default function Home() {
       display="flex" 
       flexDirection="column"
       justifyContent="center" 
-      alignItems="center" 
+      alignItems="center"
+      bgcolor="#616161" 
       gap={2}
     >
-      <Button 
+      <Button
+        variant="contained" 
         sx={{
           position: 'absolute',
           top: 16, 
@@ -139,13 +141,16 @@ export default function Home() {
               fullWidth
               value={itemName}
               onChange={(e) => {
-                setItemName(e.target.value)
+                setItemName(e.target.value.toLocaleLowerCase())
               }}
             />
             <Button
               variant="outlined"
               onClick={() => {
-                addItem(itemName.toLocaleLowerCase())
+                addItem(itemName)
+                if (searchResult?.name === itemName) {
+                  setSearchResult({ ...searchResult, quantity: searchResult.quantity + 1 });
+                }
                 setItemName('')
                 handleCloseAdd()
               }}
@@ -180,13 +185,13 @@ export default function Home() {
               fullWidth
               value={itemName}
               onChange={(e) => {
-                setItemName(e.target.value)
+                setItemName(e.target.value.toLocaleLowerCase())
               }}
             />
             <Button
               variant="outlined"
               onClick={() => {
-                searchItem(itemName.toLowerCase());
+                searchItem(itemName);
                 setItemName('')
               }}
             >
@@ -260,12 +265,12 @@ export default function Home() {
         <Box
           width="800px"
           height="100px"
-          bgcolor="#ADD8E6"
+          bgcolor="#9e9e9e"
           display="flex"
           alignItems="center"
           justifyContent="center"
         >
-          <Typography variant="h2" color="#333">
+          <Typography variant="h2" color="white">
             Inventory Items
           </Typography>
         </Box>
