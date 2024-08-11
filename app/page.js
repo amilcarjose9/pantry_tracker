@@ -11,13 +11,18 @@ import {useAuthState} from 'react-firebase-hooks/auth';
 export default function Home() {
   const [user] = useAuthState(auth)
   const router = useRouter()
-  const userSession = sessionStorage.getItem('userId')
+  const [userSession, setUserSession] = useState(null);
 
-  console.log({user})
- 
-  if (!user && !userSession){
-    router.push('/sign-in')
-  }
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const session = sessionStorage.getItem('userId');
+      if (session) {
+        setUserSession(session);
+      } else if (!user) {
+        router.push('/sign-in');
+      }
+    }
+  }, [user, router]);
 
   const[inventory, setInventory] = useState([])
   const[openAdd, setOpenAdd] = useState(false)
