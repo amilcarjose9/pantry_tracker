@@ -1,6 +1,6 @@
 'use client'
 import Image from "next/image";
-import {useState, useEffect} from 'react';
+import { useCallback, useState, useEffect, use} from 'react';
 import { auth, firestore } from "@/firebase";
 import { Box, Button, Modal, Stack, TextField, Typography } from "@mui/material";
 import { collection, deleteDoc, doc, getDocs, query, setDoc, getDoc} from "firebase/firestore";
@@ -25,7 +25,7 @@ export default function Home() {
   const[itemName, setItemName] = useState('')
   const [searchResult, setSearchResult] = useState(null);
 
-  const updateInventory = async () => {
+  const updateInventory = useCallback(async () => {
     const snapshot = query(collection(firestore, `users/${userSession}/inventory`))
     const docs = await getDocs(snapshot)
     const inventoryList = []
@@ -38,7 +38,7 @@ export default function Home() {
     setInventory(inventoryList)
     console.log(inventoryList)
 
-  }
+  }, [userSession]) 
 
   const addItem = async (item) => {
     const docRef = doc(collection(firestore, `users/${userSession}/inventory`), item)
@@ -83,7 +83,7 @@ export default function Home() {
 
   useEffect(()=>{
     updateInventory()
-  }, [])
+  }, [updateInventory])
 
   const handleOpenAdd = () => setOpenAdd(true)
   const handleCloseAdd = () => setOpenAdd(false)
